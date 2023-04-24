@@ -7,8 +7,6 @@ version
 
 Install the binary from the `Release` tab and put in into you `PATH`
 
-#
-
 ## Usage
 
 ```bash
