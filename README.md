@@ -3,8 +3,6 @@
 A small utility for getting all your used modules and their
 version
 
-#
-
 ## Installation
 
 Install the binary from the `Release` tab and put in into you `PATH`
