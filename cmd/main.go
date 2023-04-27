@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
-	"github.com/kataras/tablewriter"
 	"github.com/lensesio/tableprinter"
 	"os"
 	"path/filepath"
@@ -16,7 +15,7 @@ func main() {
 	flag.Parse()
 
 	if *moduleName == "" {
-		panic("Must specify a module name.")
+		exit("Must specify a module name.")
 	}
 
 	var terraformDirs = []string{".terraform", ".terragrunt-cache"}
@@ -31,8 +30,7 @@ func main() {
 		if _, err := os.Stat(dirPath); os.IsNotExist(err) {
 			errorCount++
 			if errorCount > 1 {
-				fmt.Fprint(os.Stderr, "couldn't find '.terraform' or '.terragrunt-cache' directory\n")
-				os.Exit(1)
+				exit("couldn't find '.terraform' or '.terragrunt-cache' directory")
 			}
 		} else {
 			existedFolder = dir
@@ -54,13 +52,11 @@ func main() {
 	})
 
 	if err != nil {
-		fmt.Printf("Error searching for modules.json file in '%s': %v\n", existedFolder, err)
-		os.Exit(1)
+		exit(fmt.Sprintf("Error searching for modules.json file in '%s': %v\n", existedFolder, err))
 	}
 
 	if modulesFile == "" {
-		fmt.Printf("Could not find 'modules.json' file in '%s'.\n", existedFolder)
-		os.Exit(1)
+		exit(fmt.Sprintf("Could not find 'modules.json' file in '%s'.\n", existedFolder))
 	}
 
 	data, err := os.ReadFile(modulesFile)
@@ -69,22 +65,19 @@ func main() {
 	var modules Modules
 
 	if err := json.Unmarshal([]byte(data), &modules); err != nil {
-		panic(err)
+		exit(err.Error())
 	}
 
 	var foundModules = formatModules(modules, *moduleName)
 
 	if len(foundModules) == 0 {
-		panic(fmt.Sprintf("found no results for '%s' in modules.json", *moduleName))
+		exit(fmt.Sprintf("found no results for '%s' in modules.json", *moduleName))
 	}
 
 	printer := tableprinter.New(os.Stdout)
 	printer.BorderTop, printer.BorderBottom, printer.BorderLeft, printer.BorderRight = true, true, true, true
 	printer.CenterSeparator = "│"
 	printer.ColumnSeparator = "│"
-	printer.RowSeparator = "─"
-	printer.HeaderBgColor = tablewriter.BgBlackColor
-	printer.HeaderFgColor = tablewriter.FgGreenColor
 
 	printer.Print(foundModules)
 
@@ -94,6 +87,11 @@ func check(e error) {
 	if e != nil {
 		panic(e)
 	}
+}
+
+func exit(s string) {
+	fmt.Fprintf(os.Stderr, "%s\n", s)
+	os.Exit(1)
 }
 
 // Returns a formated formated module name where the provided substring is highligthed
@@ -149,6 +147,6 @@ type Modules struct {
 
 type foundModule struct {
 	ModuleName      string `header:"module name"`
-	Version         string `header:"value"`
+	Version         string `header:"version"`
 	ModuleLocalName string `header:"local name"`
 }
