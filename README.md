@@ -10,11 +10,12 @@ Install the binary from the `Release` tab and put in into you `PATH`
 ## Usage
 
 ```bash
-❯ terraform-modules-used-version --module <module_name>
+docker run -v $(pwd):/home/.terraform eyalsolomon/terraform-module-used-version --module <module_name>
 ```
 
 - where `<module_name>` can be `terraform-aws-modules/rds/aws`
   (or `rds` as a shorthand)
+- **IMPORTANT** you should run this in project parent directory (meaning where `.terraform` / `.terraform-cache` folders are)
 
 example `module` you want to know the used version :
 
