@@ -10,7 +10,7 @@ Install the binary from the `Release` tab and put in into you `PATH`
 ## Usage
 
 ```bash
-docker run -v $(pwd):/home/.terraform eyalsolomon/terraform-module-used-version --module <module_name>
+docker run -v $(pwd):/home/.terraform:ro eyalsolomon/terraform-module-used-version --module <module_name>
 ```
 
 - where `<module_name>` can be `terraform-aws-modules/rds/aws`
